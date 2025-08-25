@@ -5,7 +5,9 @@ import com.example.demo.repositories.CompraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class CompraService {
@@ -18,6 +20,23 @@ public class CompraService {
 
     public CompraModel createCompra(CompraModel compra) {
         return compraRepository.save(compra);
+    }
+
+    public Optional<CompraModel> getCompraById(Integer id) {
+        return compraRepository.findById(id);
+    }
+
+    public ArrayList<CompraModel> getCompraByFecha(LocalDateTime fecha) {
+        return compraRepository.findByFecha(fecha);
+    }
+
+    public boolean deleteCompra(Integer id) {
+        try {
+            compraRepository.deleteById(id);
+            return true;
+        } catch (Exception err) {
+            return false;
+        }
     }
 
 }
