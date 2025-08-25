@@ -5,7 +5,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "facturacompraventa", schema = "mydb")
-public class FacturaCompra {
+public class FacturaCompraModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +21,13 @@ public class FacturaCompra {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "compra_idcompra", nullable = false, referencedColumnName = "idcompra")
-    private Compra compra;
+    private CompraModel compra;
 
-    public FacturaCompra() {
+    public FacturaCompraModel() {
 
     }
 
-    public FacturaCompra(String medioPago, Integer total, Compra compra) {
+    public FacturaCompraModel(String medioPago, Integer total, CompraModel compra) {
         this.medioPago = medioPago;
         this.total = total;
         this.compra = compra;
@@ -59,18 +59,18 @@ public class FacturaCompra {
     }
 
 
-    public Compra getCompra() {
+    public CompraModel getCompra() {
         return compra;
     }
 
-    public void setCompra(Compra compra) {
+    public void setCompra(CompraModel compra) {
         this.compra = compra;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FacturaCompra that)) return false;
+        if (!(o instanceof FacturaCompraModel that)) return false;
         return Objects.equals(idFacturaCompra, that.idFacturaCompra);
     }
 

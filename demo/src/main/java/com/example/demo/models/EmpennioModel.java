@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "empennio", schema = "mydb")
-public class Empennio {
+public class EmpennioModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +29,10 @@ public class Empennio {
     @Column(name = "interes", nullable = false)
     private BigDecimal interes;
 
-    public Empennio() {
+    public EmpennioModel() {
     }
 
-    public Empennio(BigDecimal precio, String estado, LocalDateTime fechaInicio, LocalDateTime fechaFinal, BigDecimal interes) {
+    public EmpennioModel(BigDecimal precio, String estado, LocalDateTime fechaInicio, LocalDateTime fechaFinal, BigDecimal interes) {
         this.precio = precio;
         this.estado = estado;
         this.fechaInicio = fechaInicio;
@@ -92,7 +92,7 @@ public class Empennio {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Empennio empennio)) return false;
+        if (!(o instanceof EmpennioModel empennio)) return false;
         return Objects.equals(idempennio, empennio.idempennio);
     }
 

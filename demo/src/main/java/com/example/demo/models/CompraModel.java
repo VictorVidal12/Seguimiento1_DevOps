@@ -4,21 +4,16 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * Entidad Compra simplificada sin referencias a Usuario ni Producto.
- */
+
 @Entity
 @Table(name = "compra", schema = "mydb")
-public class Compra {
+public class CompraModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idcompra", nullable = false)
     private Integer idcompra;
 
-    /**
-     * Total de la compra. Si necesitas precisión decimal, cambia a BigDecimal.
-     */
     @Column(name = "total", nullable = false)
     private Integer total;
 
@@ -28,11 +23,11 @@ public class Compra {
     @Column(name = "estado", length = 30, nullable = false)
     private String estado;
 
-    public Compra() {
+    public CompraModel() {
         // JPA
     }
 
-    public Compra(Integer total, LocalDateTime fechaCompra, String estado) {
+    public CompraModel(Integer total, LocalDateTime fechaCompra, String estado) {
         this.total = total;
         this.fechaCompra = fechaCompra;
         this.estado = estado;
@@ -74,7 +69,7 @@ public class Compra {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Compra compra)) return false;
+        if (!(o instanceof CompraModel compra)) return false;
         return Objects.equals(idcompra, compra.idcompra);
     }
 
