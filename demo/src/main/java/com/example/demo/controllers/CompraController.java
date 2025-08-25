@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/compra")
+@RequestMapping("/compras")
 public class CompraController {
     @Autowired
     CompraService compraService;

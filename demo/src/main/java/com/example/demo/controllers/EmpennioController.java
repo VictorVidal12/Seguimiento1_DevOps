@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/empennio")
+@RequestMapping("/empennios")
 public class EmpennioController {
     @Autowired
     EmpennioService empennioService;

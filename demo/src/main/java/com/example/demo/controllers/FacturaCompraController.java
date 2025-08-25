@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/facturacompra")
+@RequestMapping("/facturas")
 public class FacturaCompraController {
     @Autowired
     FacturaCompraService facturaCompraService;
