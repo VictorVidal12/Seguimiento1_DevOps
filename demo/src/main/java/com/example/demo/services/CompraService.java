@@ -26,8 +26,8 @@ public class CompraService {
         return compraRepository.findById(id);
     }
 
-    public ArrayList<CompraModel> getCompraByFecha(LocalDateTime fecha) {
-        return compraRepository.findByFecha(fecha);
+    public ArrayList<CompraModel> getCompraByFecha(LocalDateTime fechaCompra) {
+        return compraRepository.findByFechaCompra(fechaCompra);
     }
 
     public boolean deleteCompra(Integer id) {

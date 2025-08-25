@@ -31,8 +31,8 @@ public class CompraController {
     }
 
     @GetMapping ("/query")
-    public ArrayList<CompraModel> getCompraByPrioridad(@RequestParam("fecha") LocalDateTime fecha) {
-        return compraService.getCompraByFecha(fecha);
+    public ArrayList<CompraModel> getCompraByFecha(@RequestParam("fechaCompra") LocalDateTime fechaCompra) {
+        return compraService.getCompraByFecha(fechaCompra);
     }
 
     @DeleteMapping ( path = "/{id}")

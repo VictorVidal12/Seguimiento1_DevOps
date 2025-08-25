@@ -10,5 +10,5 @@ import java.util.ArrayList;
 
 @Repository
 public interface CompraRepository extends CrudRepository<CompraModel, Integer> {
-    ArrayList<CompraModel> findByFecha(LocalDateTime fecha);
+    ArrayList<CompraModel> findByFechaCompra(LocalDateTime fechaCompra);
 }
