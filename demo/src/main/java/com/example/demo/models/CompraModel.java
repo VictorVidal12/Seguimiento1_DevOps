@@ -6,7 +6,7 @@ import java.util.Objects;
 
 
 @Entity
-@Table(name = "compra", schema = "mydb")
+@Table(name = "compra")
 public class CompraModel {
 
     @Id

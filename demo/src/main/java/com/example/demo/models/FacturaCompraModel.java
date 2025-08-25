@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "facturacompraventa", schema = "mydb")
+@Table(name = "facturacompra")
 public class FacturaCompraModel {
 
     @Id
