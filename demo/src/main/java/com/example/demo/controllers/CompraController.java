@@ -21,8 +21,8 @@ public class CompraController {
     }
 
     @PostMapping
-    public CompraModel createCompra (@RequestBody CompraModel compra) {
-        return compraService.createCompra(compra);
+    public CompraModel postCompra (@RequestBody CompraModel compra) {
+        return compraService.postCompra(compra);
     }
 
     @GetMapping( path = "/{id}")
@@ -41,7 +41,7 @@ public class CompraController {
         if (ok) {
             return "Se eliminó la compra con id " + id + " correctamente.";
         } else {
-            return "No se pudo eliminar el usuario con id " + id + " porfavor, verifica si el id es correcto.";
+            return "No se pudo eliminar la compra con id " + id + " porfavor, verifica si el id es correcto.";
         }
     }
 

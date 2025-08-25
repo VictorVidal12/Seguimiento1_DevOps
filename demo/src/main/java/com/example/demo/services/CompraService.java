@@ -18,7 +18,7 @@ public class CompraService {
         return (ArrayList<CompraModel>) compraRepository.findAll();
     }
 
-    public CompraModel createCompra(CompraModel compra) {
+    public CompraModel postCompra(CompraModel compra) {
         return compraRepository.save(compra);
     }
 
