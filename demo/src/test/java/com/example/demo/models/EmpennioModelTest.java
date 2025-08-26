@@ -85,9 +85,60 @@ class EmpennioModelTest {
 
         EmpennioModel b = new EmpennioModel();
         b.setIdempennio(2);
-
-        // Si la entidad implementa equals por id, estos deben ser iguales:
         assertEquals(a, b);
         assertEquals(a.hashCode(), b.hashCode());
+    }
+
+    @Test
+    void equals_reflexive_returnsTrue_whenSameReference() {
+        EmpennioModel a = new EmpennioModel();
+        a.setIdempennio(10);
+        assertEquals(a, a, "equals debe ser true para la misma referencia (reflexivo)");
+    }
+
+    @Test
+    void equals_returnsFalse_whenComparedWithDifferentClass() {
+        EmpennioModel a = new EmpennioModel();
+        a.setIdempennio(11);
+        assertNotEquals("una cadena", a, "equals debe ser false cuando se compara con otra clase");
+    }
+
+    @Test
+    void equals_returnsFalse_whenComparedWithNull() {
+        EmpennioModel a = new EmpennioModel();
+        a.setIdempennio(12);
+        assertNotEquals(null, a, "equals debe ser false cuando se compara con null");
+    }
+
+    @Test
+    void equals_returnsFalse_forDifferentIds() {
+        EmpennioModel a = new EmpennioModel();
+        a.setIdempennio(20);
+
+        EmpennioModel b = new EmpennioModel();
+        b.setIdempennio(21);
+
+        assertNotEquals(a, b, "objetos con ids distintos no deben ser iguales");
+    }
+
+    @Test
+    void equals_andHashCode_whenBothIdsNull_shouldBeEqual() {
+        EmpennioModel x = new EmpennioModel();
+        EmpennioModel y = new EmpennioModel();
+
+        assertNull(x.getIdempennio());
+        assertNull(y.getIdempennio());
+
+        assertEquals(x, y, "dos instancias con id null deberían considerarse iguales si equals compara ids con Objects.equals");
+        assertEquals(x.hashCode(), y.hashCode(), "hashCode debe coincidir para objetos iguales");
+    }
+
+    @Test
+    void equals_returnsFalse_whenOneIdNullAndOtherNotNull() {
+        EmpennioModel x = new EmpennioModel();
+        x.setIdempennio(null);
+        EmpennioModel y = new EmpennioModel();
+        y.setIdempennio(5);
+        assertNotEquals(x, y, "si un id es null y el otro no, equals debe ser false");
     }
 }
