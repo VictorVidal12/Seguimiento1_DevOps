@@ -55,12 +55,11 @@ class CompraServiceTest {
     void postCompra_savesAndReturns() {
         CompraModel c = new CompraModel();
         when(compraRepository.save(c)).thenReturn(c);
-
         CompraModel res = compraService.postCompra(c);
-
         assertThat(res).isSameAs(c);
         verify(compraRepository).save(c);
     }
+
 
     @Test
     void getCompraById_foundAndNotFound() {
@@ -70,10 +69,12 @@ class CompraServiceTest {
         assertThat(present).isPresent().contains(c);
         verify(compraRepository).findById(2);
 
+
         when(compraRepository.findById(99)).thenReturn(Optional.empty());
         Optional<CompraModel> empty = compraService.getCompraById(99);
         assertThat(empty).isNotPresent();
     }
+
 
     @Test
     void getCompraByFecha_returnsList() {
@@ -87,13 +88,13 @@ class CompraServiceTest {
         verify(compraRepository).findByFechaCompra(fecha);
     }
 
+
     @Test
     void deleteCompra_successAndFailure() {
         doNothing().when(compraRepository).deleteById(1);
         boolean ok = compraService.deleteCompra(1);
         assertThat(ok).isTrue();
         verify(compraRepository).deleteById(1);
-
         doThrow(new RuntimeException("fail-delete")).when(compraRepository).deleteById(2);
         boolean nok = compraService.deleteCompra(2);
         assertThat(nok).isFalse();
