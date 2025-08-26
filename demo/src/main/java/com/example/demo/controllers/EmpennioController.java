@@ -43,7 +43,4 @@ public class EmpennioController {
             return "No se pudo eliminar el empeño con id " + id + " porfavor, verifica si el id es correcto.";
         }
     }
-
-
-
 }
