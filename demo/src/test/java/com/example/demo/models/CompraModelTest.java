@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 class CompraModelTest {
 
+
+
     @Test
     void gettersAndSetters_andToString() {
         CompraModel c = new CompraModel();
