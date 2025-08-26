@@ -34,7 +34,7 @@ public class FacturaCompraService {
         try {
             facturaCompraRepository.deleteById(id);
             return true;
-        } catch (Exception e) {
+        } catch (Exception err) {
             return false;
         }
     }
