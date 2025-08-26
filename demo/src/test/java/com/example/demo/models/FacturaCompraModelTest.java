@@ -5,6 +5,31 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FacturaCompraModelTest {
+    @Test
+    void constructorShouldSetAllFields() {
+        CompraModel compra = new CompraModel();
+        compra.setIdcompra(1);
+
+        FacturaCompraModel factura = new FacturaCompraModel("EFECTIVO", 1500, compra);
+
+        assertAll("Constructor asigna correctamente los campos",
+                () -> assertEquals("EFECTIVO", factura.getMedioPago(), "medioPago debe coincidir"),
+                () -> assertEquals(1500, factura.getTotal(), "total debe coincidir"),
+                () -> assertSame(compra, factura.getCompra(), "compra debe ser la misma referencia pasada al constructor")
+        );
+    }
+
+    @Test
+    void constructorShouldAcceptNulls() {
+        FacturaCompraModel factura = new FacturaCompraModel(null, null, null);
+
+        assertAll("Constructor acepta valores null",
+                () -> assertNull(factura.getMedioPago(), "medioPago debe ser null"),
+                () -> assertNull(factura.getTotal(), "total debe ser null"),
+                () -> assertNull(factura.getCompra(), "compra debe ser null")
+        );
+    }
+
 
     @Test
     void gettersAndToString_includesCompraId_whenCompraNotNull() {
