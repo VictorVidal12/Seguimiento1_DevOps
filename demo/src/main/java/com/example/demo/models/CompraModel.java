@@ -87,4 +87,6 @@ public class CompraModel {
                 ", estado='" + estado + '\'' +
                 '}';
     }
+
+
 }
