@@ -33,7 +33,7 @@ class CompraControllerTest {
 
         when(compraService.getCompraById(1)).thenReturn(Optional.of(c));
 
-        mockMvc.perform(get("/compra/1"))
+        mockMvc.perform(get("/compras/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.total").value(10));
