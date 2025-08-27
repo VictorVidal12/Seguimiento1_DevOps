@@ -15,6 +15,7 @@ env:
 jobs:
   test-build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,10 +43,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report-testing
-          path: '**/target/site/jacoco' 
+          path: '**/target/site/jacoco'
 
-      - name: Optional: Build & push image
-        if: ${{ env.PUSH_IMAGE == 'true' && success() }}
+      - name: Docker login (optional)
+        if: ${{ secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_TOKEN != '' && secrets.IMAGE_NAME != '' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Build & push Docker image (optional)
+        if: ${{ success() && secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_TOKEN != '' && secrets.IMAGE_NAME != '' }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -61,14 +69,13 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID_TESTING }}
         run: |
-          echo "Triggering Render deploy for testing service $SERVICE_ID"
+          echo "Triggering Render deploy for testing service ${SERVICE_ID}"
           resp=$(curl -s -X POST "https://api.render.com/v1/services/${SERVICE_ID}/deploys" \
             -H "Authorization: Bearer ${RENDER_API_KEY}" \
             -H "Content-Type: application/json" \
             -d '{"clearCache": false}')
           echo "Render response: $resp"
-          # Check for simple success token in response
-          if echo "$resp" | grep -qi '"deployId"\|"id"'; then
+          if echo "$resp" | grep -qi '"id"\|"deployId"'; then
             echo "Deploy triggered OK"
           else
             echo "Failed to trigger deploy. Response:" >&2
