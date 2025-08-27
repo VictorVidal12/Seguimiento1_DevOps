@@ -44,7 +44,7 @@ jobs:
           name: jacoco-report-testing
           path: '**/target/site/jacoco' 
 
-      - name: Optional: Build & push image (if you use registry-based Render deploy)
+      - name: Optional: Build & push image
         if: ${{ env.PUSH_IMAGE == 'true' && success() }}
         uses: docker/build-push-action@v5
         with:
