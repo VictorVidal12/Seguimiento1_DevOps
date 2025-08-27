@@ -1,0 +1,79 @@
+name: Testing
+
+on:
+  push:
+    branches: [ testing ]
+  pull_request:
+    branches: [ testing ]
+
+permissions:
+  contents: read
+
+env:
+  MAVEN_OPTS: -Xmx2g
+
+jobs:
+  test-build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Run tests + JaCoCo check (threshold 60%)
+        # Este comando asume que tu pom.xml tiene jacoco-maven-plugin configurado y que
+        # usa la propiedad ${coverage.threshold} en jacoco:check
+        run: mvn -B -Dcoverage.threshold=0.60 clean verify
+
+      - name: Upload JaCoCo HTML report (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report-testing
+          path: '**/target/site/jacoco' 
+
+      - name: Optional: Build & push image (if you use registry-based Render deploy)
+        if: ${{ env.PUSH_IMAGE == 'true' && success() }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.IMAGE_NAME }}:testing-${{ github.sha }}
+            ${{ secrets.IMAGE_NAME }}:testing-latest
+
+      - name: Trigger Render deploy (testing service)
+        if: success()
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID_TESTING }}
+        run: |
+          echo "Triggering Render deploy for testing service $SERVICE_ID"
+          resp=$(curl -s -X POST "https://api.render.com/v1/services/${SERVICE_ID}/deploys" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": false}')
+          echo "Render response: $resp"
+          # Check for simple success token in response
+          if echo "$resp" | grep -qi '"deployId"\|"id"'; then
+            echo "Deploy triggered OK"
+          else
+            echo "Failed to trigger deploy. Response:" >&2
+            echo "$resp" >&2
+            exit 1
+          fi
