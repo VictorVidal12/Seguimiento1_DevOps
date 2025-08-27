@@ -35,8 +35,6 @@ jobs:
             ${{ runner.os }}-m2-
 
       - name: Run tests + JaCoCo check (threshold 60%)
-        # Este comando asume que tu pom.xml tiene jacoco-maven-plugin configurado y que
-        # usa la propiedad ${coverage.threshold} en jacoco:check
         run: mvn -B -Dcoverage.threshold=0.60 clean verify
 
       - name: Upload JaCoCo HTML report (artifact)
