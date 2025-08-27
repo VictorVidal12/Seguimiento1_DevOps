@@ -52,23 +52,37 @@ jobs:
       - name: Crear .env según rama
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            cat > .env <<EOF
-            SPRING_DATASOURCE_URL=${{ secrets.PROD_SPRING_DATASOURCE_URL }}
-            SPRING_DATASOURCE_USERNAME=${{ secrets.PROD_SPRING_DATASOURCE_USERNAME }}
-            SPRING_DATASOURCE_PASSWORD=${{ secrets.PROD_SPRING_DATASOURCE_PASSWORD }}
-            APP_PORT=${{ secrets.PROD_APP_PORT }}
-            EOF
+            SPRING_DATASOURCE_URL="${{ secrets.PROD_SPRING_DATASOURCE_URL }}"
+            SPRING_DATASOURCE_USERNAME="${{ secrets.PROD_SPRING_DATASOURCE_USERNAME }}"
+            SPRING_DATASOURCE_PASSWORD="${{ secrets.PROD_SPRING_DATASOURCE_PASSWORD }}"
+            APP_PORT="${{ secrets.PROD_APP_PORT }}"
+
+            printf '%s\n' \
+              "SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}" \
+              "SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}" \
+              "SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}" \
+              "APP_PORT=${APP_PORT}" \
+              > .env
           else
-            cat > .env <<EOF
-            POSTGRES_USER=${{ secrets.TEST_POSTGRES_USER }}
-            POSTGRES_PASSWORD=${{ secrets.TEST_POSTGRES_PASSWORD }}
-            POSTGRES_DB=${{ secrets.TEST_POSTGRES_DB }}
-            POSTGRES_PORT=${{ secrets.TEST_POSTGRES_PORT }}
-            SPRING_DATASOURCE_URL=${{ secrets.TEST_SPRING_DATASOURCE_URL }}
-            SPRING_DATASOURCE_USERNAME=${{ secrets.TEST_SPRING_DATASOURCE_USERNAME }}
-            SPRING_DATASOURCE_PASSWORD=${{ secrets.TEST_SPRING_DATASOURCE_PASSWORD }}
-            APP_PORT=${{ secrets.TEST_APP_PORT }}
-            EOF
+            POSTGRES_USER="${{ secrets.TEST_POSTGRES_USER }}"
+            POSTGRES_PASSWORD="${{ secrets.TEST_POSTGRES_PASSWORD }}"
+            POSTGRES_DB="${{ secrets.TEST_POSTGRES_DB }}"
+            POSTGRES_PORT="${{ secrets.TEST_POSTGRES_PORT }}"
+            SPRING_DATASOURCE_URL="${{ secrets.TEST_SPRING_DATASOURCE_URL }}"
+            SPRING_DATASOURCE_USERNAME="${{ secrets.TEST_SPRING_DATASOURCE_USERNAME }}"
+            SPRING_DATASOURCE_PASSWORD="${{ secrets.TEST_SPRING_DATASOURCE_PASSWORD }}"
+            APP_PORT="${{ secrets.TEST_APP_PORT }}"
+
+            printf '%s\n' \
+              "POSTGRES_USER=${POSTGRES_USER}" \
+              "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" \
+              "POSTGRES_DB=${POSTGRES_DB}" \
+              "POSTGRES_PORT=${POSTGRES_PORT}" \
+              "SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}" \
+              "SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}" \
+              "SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}" \
+              "APP_PORT=${APP_PORT}" \
+              > .env
           fi
           
       - name: Trigger Render deploy via hook
