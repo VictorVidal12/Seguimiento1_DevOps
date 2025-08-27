@@ -16,6 +16,10 @@ env:
 jobs:
   test-build-and-deploy:
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./demo
 
     steps:
       - name: Checkout
