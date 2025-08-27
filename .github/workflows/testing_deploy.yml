@@ -45,25 +45,7 @@ jobs:
           name: jacoco-report-testing
           path: '**/target/site/jacoco'
 
-      - name: Docker login (optional)
-        if: ${{ secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_TOKEN != '' && secrets.IMAGE_NAME != '' }}
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
-
-      - name: Build & push Docker image (optional)
-        if: ${{ success() && secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_TOKEN != '' && secrets.IMAGE_NAME != '' }}
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.IMAGE_NAME }}:testing-${{ github.sha }}
-            ${{ secrets.IMAGE_NAME }}:testing-latest
-
-      - name: Trigger Render deploy (testing service)
+      - name: Trigger Render deploy
         if: success()
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
