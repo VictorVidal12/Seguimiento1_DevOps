@@ -52,7 +52,6 @@ jobs:
 
       - name: Crear .env según rama
         run: |
-          # Si la rama es main, usamos variables de producción. En cualquier otra rama usamos testing.
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             cat > .env <<EOF
             SPRING_DATASOURCE_URL=${{ secrets.PROD_SPRING_DATASOURCE_URL }}
