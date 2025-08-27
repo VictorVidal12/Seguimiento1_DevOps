@@ -141,4 +141,13 @@ class EmpennioModelTest {
         y.setIdempennio(5);
         assertNotEquals(x, y, "si un id es null y el otro no, equals debe ser false");
     }
+
+    @Test
+    void equals_returnsFalse_whenOtherIsNotAnEmpennioModel() {
+        EmpennioModel modelo = new EmpennioModel();
+
+        Object otraCosa = "soy un string, no un EmpennioModel";
+
+        assertNotEquals(otraCosa, modelo, "equals debería devolver false cuando se pasa un objeto de otro tipo");
+    }
 }
