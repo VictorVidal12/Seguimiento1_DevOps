@@ -50,28 +50,23 @@ jobs:
           name: jacoco-report-testing
           path: '**/target/site/jacoco'
 
-      - name: Trigger Render deploy
+      - name: Trigger Render deploy (testing service)
         if: success()
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID_TESTING }}
         run: |
-          echo "Triggering Render deploy for testing service ${SERVICE_ID:0:12}..."
-          resp=$(curl -s -w "\n%{http_code}" -X POST "https://api.render.com/v1/services/${SERVICE_ID}/deploys" \
+          echo "Triggering Render deploy for main service ${SERVICE_ID}"
+          resp=$(curl -s -X POST "https://api.render.com/v1/services/${SERVICE_ID}/deploys" \
             -H "Authorization: Bearer ${RENDER_API_KEY}" \
             -H "Content-Type: application/json" \
-            --data-binary @- <<'JSON'
-          {"clearCache": false}
-          JSON
-          )
-          echo "$resp"
-          http_code=$(echo "$resp" | tail -n1)
-          body_resp=$(echo "$resp" | sed '$d')
-          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            -d '{"clearCache": false}')
+          echo "Render response: $resp"
+          if echo "$resp" | grep -qi '"id"\|"deployId"'; then
             echo "Deploy triggered OK"
           else
             echo "Failed to trigger deploy. Response:" >&2
-            echo "$body_resp" >&2
+            echo "$resp" >&2
             exit 1
           fi
 
