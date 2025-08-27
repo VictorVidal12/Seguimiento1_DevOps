@@ -50,36 +50,89 @@ jobs:
           name: jacoco-report-testing
           path: '**/target/site/jacoco'
 
-      - name: Validate Render secrets (safe checks)
+      - name: Validate & sanitize Render secrets (safe, robust)
         if: always()
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID_TESTING }}
         run: |
+          set -euo pipefail
+
+          # show whether SERVICE_ID looks correct (no secret value printed)
+          echo "SERVICE_ID present? ${SERVICE_ID:+yes}"
+          echo "SERVICE_ID length: ${#SERVICE_ID}"
+          echo "SERVICE_ID prefix: ${SERVICE_ID:0:4}"
+
+          # show length of API key and detect CR / LF / leading/trailing spaces (but DO NOT print the key)
+          len_orig=$(printf '%s' "$RENDER_API_KEY" | wc -c)
+          echo "RENDER_API_KEY length (bytes): $len_orig"
+
+          # show hex of first and last bytes (safe small sample, not full secret)
+          head_hex=$(printf '%s' "$RENDER_API_KEY" | head -c 8 | xxd -p | tr -d '\n' || true)
+          tail_hex=$(printf '%s' "$RENDER_API_KEY" | tail -c 8 | xxd -p | tr -d '\n' || true)
+          echo "RENDER_API_KEY first bytes (hex): ${head_hex:-<empty>}"
+          echo "RENDER_API_KEY last  bytes (hex): ${tail_hex:-<empty>}"
+
+          # detect explicit newline or carriage return bytes anywhere
+          if printf '%s' "$RENDER_API_KEY" | grep -q $'\r'; then
+            echo "WARNING: RENDER_API_KEY contains carriage return (CR, 0x0D)."
+          fi
+          if printf '%s' "$RENDER_API_KEY" | grep -q $'\n'; then
+            echo "WARNING: RENDER_API_KEY contains newline (LF, 0x0A)."
+          fi
+
+          # detect leading / trailing whitespace
+          trimmed="$(printf '%s' "$RENDER_API_KEY" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          len_trimmed=$(printf '%s' "$trimmed" | wc -c)
+          echo "Length after trimming leading/trailing whitespace: $len_trimmed"
+
+          if [ "$len_orig" -ne "$len_trimmed" ]; then
+            echo "WARNING: trimming removed whitespace (leading/trailing). Will use sanitized key."
+          fi
+
+          # Create sanitized key: remove CR and LF, then trim leading/trailing spaces.
+          SANITIZED_KEY=$(printf '%s' "$RENDER_API_KEY" | tr -d '\r\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+          echo "Sanitized key length: $(printf '%s' \"$SANITIZED_KEY\" | wc -c)"
+
+          # Quick sanity check for SERVICE_ID value
           if [ -z "$SERVICE_ID" ]; then
             echo "ERROR: SERVICE_ID está vacío. Revisa el secret RENDER_SERVICE_ID_TESTING" >&2
             exit 1
           fi
-          prefix="${SERVICE_ID:0:4}"
-          echo "SERVICE_ID prefix: $prefix"
-          if [ "$prefix" != "srv-" ]; then
+          if [ "${SERVICE_ID:0:4}" != "srv-" ]; then
             echo "ERROR: SERVICE_ID no parece un service id válido (debe empezar por 'srv-')." >&2
-            echo "Revisa que hayas guardado el Service ID (srv-...) y no el nombre del servicio." >&2
             exit 1
           fi
 
-          if [ -z "$RENDER_API_KEY" ]; then
-            echo "ERROR: RENDER_API_KEY vacío. Revisa el secret RENDER_API_KEY" >&2
-            exit 1
-          fi
-          # detectar newline/carriage return
-          if printf '%s' "$RENDER_API_KEY" | grep -q $'\n'; then
-            echo "ERROR: RENDER_API_KEY contiene saltos de línea. Re-crear el secret sin newlines." >&2
-            exit 1
-          fi
+          # Now attempt the deploy using the sanitized key
+          echo "Triggering Render deploy for testing service ${SERVICE_ID:0:12}..."  # only show prefix
+          resp=$(curl -s -w "\n%{http_code}" -X POST "https://api.render.com/v1/services/${SERVICE_ID}/deploys" \
+            -H "Authorization: Bearer ${SANITIZED_KEY}" \
+            -H "Content-Type: application/json" \
+            --data-binary @- <<'JSON'
+              {"clearCache": false}
+              JSON
+          ) || true
 
-          echo "Checks OK (no se ha impreso ningún secreto)."
+          echo "Raw response (body + status):"
+          echo "$resp"
+
+          http_code=$(echo "$resp" | tail -n1)
+          body_resp=$(echo "$resp" | sed '$d')
+
+          echo "HTTP code: $http_code"
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "Deploy triggered OK"
+          else
             echo "Failed to trigger deploy. Response body:" >&2
             echo "$body_resp" >&2
+            # If we sanitized something, print a hint (not the secret)
+            if [ "$len_orig" -ne "$len_trimmed" ]; then
+              echo "Hint: secret had extra whitespace/newlines and we used a sanitized version in the request." >&2
+            fi
+            exit 1
+          fi
+
+
             exit 1
           fi
