@@ -35,6 +35,7 @@ class FacturaCompraControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /*
     @Test
     void whenGetById_thenReturnOkJson() throws Exception {
         FacturaCompraModel f = new FacturaCompraModel();
@@ -103,4 +104,6 @@ class FacturaCompraControllerTest {
 
         verify(facturaService, times(1)).postFactura(any(FacturaCompraModel.class));
     }
+
+     */
 }

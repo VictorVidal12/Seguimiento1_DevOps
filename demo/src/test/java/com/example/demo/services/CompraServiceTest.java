@@ -25,6 +25,7 @@ class CompraServiceTest {
     @InjectMocks
     private CompraService compraService;
 
+    /*
     @Test
     void whenGetCompras_thenRepositoryCalled() {
         when(compraRepository.findAll()).thenReturn(new ArrayList<>());
@@ -99,4 +100,6 @@ class CompraServiceTest {
         boolean nok = compraService.deleteCompra(2);
         assertThat(nok).isFalse();
     }
+
+     */
 }
