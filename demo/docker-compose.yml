@@ -1,8 +1,7 @@
 services:
   postgres:
     image: postgres:17
-    env_file:
-      - ${ENV_FILE:-.env}
+    env_file: .env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
