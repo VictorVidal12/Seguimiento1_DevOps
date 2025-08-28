@@ -1,10 +1,10 @@
-name: Testing
+name: Main
 
 on:
   push:
-    branches: [ testing ]
+    branches: [ main ]
   pull_request:
-    branches: [ testing ]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -39,9 +39,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-m2-
-
-      - name: Run tests + JaCoCo check
-        run: mvn -B -Dcoverage.threshold=0.60 clean verify
+      - name: Run tests + JaCoCo check (threshold 85%)
+        run: mvn -B -Dcoverage.threshold=0.85 clean verify
 
       - name: Upload JaCoCo HTML report (artifact)
         if: always()
@@ -89,7 +88,6 @@ jobs:
       - name: Trigger Render deploy via hook
         if: success()
         env:
-          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_TESTING }}
+          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_MAIN }}
         run: |
           curl -s -X POST "${DEPLOY_HOOK_URL}"
-
