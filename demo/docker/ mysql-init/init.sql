@@ -1,4 +1,0 @@
-CREATE DATABASE IF NOT EXISTS `my_devops_db`;
-CREATE USER IF NOT EXISTS 'spring'@'%' IDENTIFIED BY 'spring123';
-GRANT ALL PRIVILEGES ON `my_devops_db`.* TO 'spring'@'%';
-FLUSH PRIVILEGES;
