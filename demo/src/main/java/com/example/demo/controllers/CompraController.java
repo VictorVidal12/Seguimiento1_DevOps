@@ -4,6 +4,9 @@ import com.example.demo.models.CompraModel;
 import com.example.demo.services.CompraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +48,18 @@ public class CompraController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CompraModel> putCompra(@PathVariable Integer id, @RequestBody CompraModel compra) {
+        return compraService.putCompra(id, compra)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<CompraModel> patchCompra(@PathVariable Integer id, @RequestBody CompraModel partial) {
+        return compraService.patchCompra(id, partial)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
 }

@@ -6,6 +6,9 @@ import com.example.demo.services.CompraService;
 import com.example.demo.services.FacturaCompraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -43,6 +46,20 @@ public class FacturaCompraController {
     @PostMapping
     public FacturaCompraModel postFactura (@RequestBody FacturaCompraModel factura) {
         return facturaCompraService.postFactura(factura);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FacturaCompraModel> putFacturaCompra( @PathVariable Integer id, @Valid @RequestBody FacturaCompraModel factura) {
+        return facturaCompraService.putFacturaCompra(id, factura)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<FacturaCompraModel> patchFacturaCompra (@PathVariable Integer id, @RequestBody FacturaCompraModel partial) {
+        return facturaCompraService.patchFacturaCompra(id, partial)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping ( path = "/{id}")

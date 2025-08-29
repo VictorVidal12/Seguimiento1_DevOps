@@ -4,6 +4,9 @@ import com.example.demo.models.EmpennioModel;
 import com.example.demo.services.EmpennioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -32,6 +35,20 @@ public class EmpennioController {
     @GetMapping ("/query")
     public ArrayList<EmpennioModel> getEmpennioByEstado(@RequestParam("estado") String estado) {
         return empennioService.getEmpenniosByEstado(estado);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EmpennioModel> putEmpennio( @PathVariable Integer id, @Valid @RequestBody EmpennioModel empennio) {
+        return empennioService.putEmpennio(id, empennio)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<EmpennioModel> patchEmpennio (@PathVariable Integer id, @RequestBody EmpennioModel partial) {
+        return empennioService.patchEmpennio(id, partial)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping ( path = "/{id}")

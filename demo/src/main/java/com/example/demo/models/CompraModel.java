@@ -24,7 +24,7 @@ public class CompraModel {
     private String estado;
 
     public CompraModel() {
-        // JPA
+
     }
 
     public CompraModel(Integer total, LocalDateTime fechaCompra, String estado) {
