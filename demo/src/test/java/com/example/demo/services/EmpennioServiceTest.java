@@ -44,7 +44,6 @@ class EmpennioServiceTest {
         public Boolean getActivo() { return activo; }
         public void setActivo(Boolean activo) { this.activo = activo; }
     }
-    /*
 
     @Test
     void whenGetEmpennios_thenRepositoryCalled() {
@@ -247,5 +246,5 @@ class EmpennioServiceTest {
         verify(empennioRepository, times(1)).findById(id);
         verify(empennioRepository, never()).save(any());
     }
-    */
+
 }
