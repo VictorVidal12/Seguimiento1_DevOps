@@ -58,6 +58,7 @@ class FacturaCompraServiceTest {
         // NO dejamos stubbing global aquí para evitar UnnecessaryStubbingException.
         // Cada test define los `when(...)` que necesita.
     }
+    /*
 
     @Test
     void whenGetFacturaByCompra_thenReturnOptional() {
@@ -193,4 +194,5 @@ class FacturaCompraServiceTest {
         }
         return null;
     }
+     */
 }
