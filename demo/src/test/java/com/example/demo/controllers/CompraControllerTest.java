@@ -1,5 +1,8 @@
 package com.example.demo.controllers;
 
+import com.example.demo.models.CompraModel;
+import com.example.demo.services.CompraService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -7,25 +10,25 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import com.example.demo.models.CompraModel;
-import com.example.demo.services.CompraService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CompraController.class)
 class CompraControllerTest {
@@ -39,7 +42,7 @@ class CompraControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    /*
+
     @Test
     void whenGetAll_thenReturnJsonArray() throws Exception {
         CompraModel c1 = new CompraModel();
@@ -145,5 +148,79 @@ class CompraControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-     */
+    @Test
+    void whenPutCompra_existing_thenReturnOkAndBody() throws Exception {
+        Integer id = 10;
+        CompraModel incoming = new CompraModel(500, LocalDateTime.of(2025, 2, 1, 0, 0), "ACTUALIZADA");
+        CompraModel saved = new CompraModel(500, LocalDateTime.of(2025, 2, 1, 0, 0), "ACTUALIZADA");
+        saved.setIdcompra(id);
+
+        when(compraService.putCompra(eq(id), any(CompraModel.class))).thenReturn(Optional.of(saved));
+
+        mockMvc.perform(put("/compras/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(incoming)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.idcompra").value(id))
+                .andExpect(jsonPath("$.total").value(500))
+                .andExpect(jsonPath("$.estado").value("ACTUALIZADA"));
+
+        verify(compraService, times(1)).putCompra(eq(id), any(CompraModel.class));
+    }
+
+    @Test
+    void whenPutCompra_notFound_thenReturnNotFound() throws Exception {
+        Integer id = 99;
+        CompraModel incoming = new CompraModel(100, LocalDateTime.now(), "X");
+
+        when(compraService.putCompra(eq(id), any(CompraModel.class))).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/compras/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(incoming)))
+                .andExpect(status().isNotFound());
+
+        verify(compraService, times(1)).putCompra(eq(id), any(CompraModel.class));
+    }
+
+
+    @Test
+    void whenPatchCompra_existing_thenReturnOkAndBody() throws Exception {
+        Integer id = 5;
+        CompraModel partial = new CompraModel(null, null, "PATCHED");
+        CompraModel existing = new CompraModel(300, LocalDateTime.of(2025, 3, 1, 0, 0), "OLD");
+        existing.setIdcompra(id);
+        CompraModel saved = new CompraModel(300, LocalDateTime.of(2025, 3, 1, 0, 0), "PATCHED");
+        saved.setIdcompra(id);
+
+        when(compraService.patchCompra(eq(id), any(CompraModel.class))).thenReturn(Optional.of(saved));
+
+        mockMvc.perform(patch("/compras/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(partial)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.idcompra").value(id))
+                .andExpect(jsonPath("$.estado").value("PATCHED"));
+
+        verify(compraService, times(1)).patchCompra(eq(id), any(CompraModel.class));
+    }
+
+    @Test
+    void whenPatchCompra_notFound_thenReturnNotFound() throws Exception {
+        Integer id = 1234;
+        CompraModel partial = new CompraModel(null, null, "X");
+
+        when(compraService.patchCompra(eq(id), any(CompraModel.class))).thenReturn(Optional.empty());
+
+        mockMvc.perform(patch("/compras/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(partial)))
+                .andExpect(status().isNotFound());
+
+        verify(compraService, times(1)).patchCompra(eq(id), any(CompraModel.class));
+    }
+
+
 }

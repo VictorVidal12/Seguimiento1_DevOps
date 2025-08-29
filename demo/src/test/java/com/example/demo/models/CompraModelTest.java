@@ -102,7 +102,6 @@ class CompraModelTest {
     @Test
     void equals_returnsFalse_whenComparedWithDifferentClass() {
         CompraModel a = new CompraModel(10, LocalDateTime.now().withNano(0), "CREADA");
-        // comparar explícitamente con otra clase => debe devolver false y cubrir la rama instanceof
         assertNotEquals("una cadena", a, "equals debe devolver false si el objeto comparado no es CompraModel");
         assertNotEquals(new Object(), a, "equals debe devolver false si el objeto comparado es otra clase");
     }
@@ -110,7 +109,6 @@ class CompraModelTest {
     @Test
     void equals_returnsFalse_whenComparedWithNull() {
         CompraModel a = new CompraModel(10, LocalDateTime.now().withNano(0), "CREADA");
-        // comparar con null => instanceof devolverá false y equals debe devolver false
         assertNotEquals(null, a, "equals debe devolver false al comparar con null");
     }
 }

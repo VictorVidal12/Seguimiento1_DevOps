@@ -83,7 +83,6 @@ class FacturaCompraModelTest {
         FacturaCompraModel x = new FacturaCompraModel();
         FacturaCompraModel y = new FacturaCompraModel();
 
-        // neither has id set (null)
         assertNull(x.getIdFacturaCompra());
         assertNull(y.getIdFacturaCompra());
         assertEquals(x, y, "Dos instancias con id null deberían ser iguales si equals compara por id con Objects.equals");

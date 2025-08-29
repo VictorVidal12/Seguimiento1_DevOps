@@ -52,7 +52,6 @@ class EmpennioModelTest {
 
         e.setEstado("ACTIVO");
 
-        // Las fechas requieren LocalDateTime según la captura
         LocalDateTime inicio = LocalDateTime.of(2024, 1, 1, 9, 30);
         LocalDateTime fin    = LocalDateTime.of(2024, 12, 31, 18, 0);
         e.setFechaInicio(inicio);
@@ -61,10 +60,8 @@ class EmpennioModelTest {
 
         e.setInteres(new BigDecimal("8.5"));
 
-        // Asserts
         assertEquals(Integer.valueOf(7), e.getIdempennio());
 
-        // Para BigDecimal usar compareTo
         assertEquals(0, e.getPrecio().compareTo(new BigDecimal("123.45")),
                 "El precio debe ser 123.45");
 
