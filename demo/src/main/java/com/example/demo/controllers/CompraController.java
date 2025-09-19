@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import jakarta.validation.Valid;
+import com.example.demo.services.FacturaCompraService;
+import com.example.demo.dto.FacturaCompraDTO;
+import com.example.demo.models.FacturaCompraModel;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +38,9 @@ public class CompraController {
 
     @Value("${external.facturas.url:https://demo-276672580331.us-central1.run.app/facturas}")
     private String externalFacturasUrl;
+
+    @Autowired
+    private FacturaCompraService facturaCompraService;
 
     @GetMapping
     public ArrayList<CompraModel> getCompras () {
@@ -68,53 +75,40 @@ public class CompraController {
 
             result.set("compraCreada", objectMapper.valueToTree(savedCompra));
 
-            ObjectNode payloadForFactura;
-            if (payload.isObject()) {
-                payloadForFactura = (ObjectNode) payload.deepCopy();
-            } else {
-                payloadForFactura = objectMapper.createObjectNode();
-            }
-
-            ObjectNode compraForFactura;
-            if (payloadForFactura.has("compra") && payloadForFactura.get("compra").isObject()) {
-                compraForFactura = (ObjectNode) payloadForFactura.with("compra");
-            } else {
-                compraForFactura = objectMapper.createObjectNode();
-                payloadForFactura.set("compra", compraForFactura);
-            }
-            if (savedCompra.getIdcompra() != null) {
-                compraForFactura.put("idcompra", savedCompra.getIdcompra());
-            }
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            String payloadString = objectMapper.writeValueAsString(payloadForFactura);
-            HttpEntity<String> request = new HttpEntity<>(payloadString, headers);
-
-            ResponseEntity<String> facturaResponse;
-            try {
-                facturaResponse = restTemplate.postForEntity(externalFacturasUrl, request, String.class);
-            } catch (RestClientException ex) {
-                ObjectNode err = objectMapper.createObjectNode();
-                err.put("message", "Fallo al llamar al endpoint de facturas");
-                err.put("detail", ex.getMessage());
-                err.set("compraCreada", result.get("compraCreada"));
-                return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(err);
-            }
-
             ObjectNode externalInfo = objectMapper.createObjectNode();
-            externalInfo.put("statusCode", facturaResponse.getStatusCodeValue());
-            String body = facturaResponse.getBody();
-            if (body != null && !body.isBlank()) {
+            JsonNode facturaNode = payload.path("factura");
+
+            if (facturaNode != null && facturaNode.isObject()) {
                 try {
-                    JsonNode parsed = objectMapper.readTree(body);
-                    externalInfo.set("body", parsed);
-                } catch (Exception ignored) {
-                    externalInfo.put("bodyText", body);
+                    FacturaCompraDTO facturaDto = objectMapper.treeToValue(facturaNode, FacturaCompraDTO.class);
+
+                    facturaDto.setCompraId(savedCompra.getIdcompra());
+
+                    if (facturaDto.getMedioPago() == null || facturaDto.getMedioPago().isBlank()) {
+                        ObjectNode err = objectMapper.createObjectNode();
+                        err.put("message", "Falta campo requerido 'medio_pago' dentro de 'factura'.");
+                        err.set("compraCreada", result.get("compraCreada"));
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+                    }
+
+                    FacturaCompraModel entidad = facturaDto.toEntity(savedCompra);
+                    FacturaCompraModel savedFactura = facturaCompraService.postFactura(entidad);
+
+                    externalInfo.put("statusCode", HttpStatus.CREATED.value());
+                    externalInfo.set("body", objectMapper.valueToTree(FacturaCompraDTO.fromEntity(savedFactura)));
+
+                } catch (Exception ex) {
+                    externalInfo.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    ObjectNode errNode = objectMapper.createObjectNode();
+                    errNode.put("message", "Error interno al crear la factura localmente");
+                    errNode.put("detail", ex.getMessage());
+                    externalInfo.set("body", errNode);
                 }
             } else {
+                externalInfo.put("statusCode", HttpStatus.NO_CONTENT.value());
                 externalInfo.putNull("body");
             }
+
             result.set("respuestaFactura", externalInfo);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
