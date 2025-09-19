@@ -49,10 +49,6 @@ class EmpennioControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> b4f42e22ace7f4ddcbc97ebb08276f079f54c6f9
     @Test
     void whenGetAll_thenReturnJsonArray() throws Exception {
         EmpennioModel e1 = new EmpennioModel();
@@ -250,8 +246,4 @@ class EmpennioControllerTest {
 
         verify(empennioService, times(1)).patchEmpennio(eq(id), any(EmpennioModel.class));
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> b4f42e22ace7f4ddcbc97ebb08276f079f54c6f9
 }
