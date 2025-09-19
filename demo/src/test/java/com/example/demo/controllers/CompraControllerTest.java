@@ -42,7 +42,7 @@ class CompraControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    /*
+
     @Test
     void whenGetAll_thenReturnJsonArray() throws Exception {
         CompraModel c1 = new CompraModel();
@@ -222,5 +222,4 @@ class CompraControllerTest {
         verify(compraService, times(1)).patchCompra(eq(id), any(CompraModel.class));
     }
 
-    */
 }

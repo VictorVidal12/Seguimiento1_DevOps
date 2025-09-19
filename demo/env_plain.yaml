@@ -1,0 +1,5 @@
+﻿SPRING_DATASOURCE_USERNAME: "user_empennio"
+SPRING_DATASOURCE_PASSWORD: "Victor-123"
+SPRING_DATASOURCE_URL: "jdbc:postgresql:///casa_empennio?cloudSqlInstance=omega-mile-469001-r2:us-central1:db-devops-1&socketFactory=com.google.cloud.sql.postgres.SocketFactory"
+SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+LOGGING_LEVEL_ORG_SPRINGFRAMEWORK: "DEBUG"
