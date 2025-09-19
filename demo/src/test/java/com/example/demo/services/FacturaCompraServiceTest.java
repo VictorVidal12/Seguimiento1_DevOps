@@ -55,8 +55,6 @@ class FacturaCompraServiceTest {
         partial.setMedioPago("TRANSFERENCIA");
         partial.setTotal(null);
 
-        // NO dejamos stubbing global aquí para evitar UnnecessaryStubbingException.
-        // Cada test define los `when(...)` que necesita.
     }
 
 
