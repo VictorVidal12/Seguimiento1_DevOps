@@ -41,9 +41,11 @@ public class FacturaCompraDTO {
     public void setCompraId(Integer compraId) { this.compraId = compraId; }
 
     public FacturaCompraModel toEntity(CompraModel compraRelacionado) {
+        Integer tot = this.total == null ? 0 : this.total;
+        String medio = this.medioPago == null ? "" : this.medioPago;
         return new FacturaCompraModel(
-                this.medioPago,
-                this.total,
+                medio,
+                tot,
                 compraRelacionado
         );
     }

@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 
 @RestController
@@ -40,6 +43,7 @@ public class FacturaCompraController {
             ObjectNode err = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode();
             err.put("message", "Error interno al recuperar facturas");
             err.put("detail", e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -82,19 +86,38 @@ public class FacturaCompraController {
         }
     }
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> postFactura(@RequestBody FacturaCompraDTO dto) {
+    public ResponseEntity<?> postFactura(@RequestBody JsonNode payload) {
         try {
-            Integer compraId = dto.getCompraId();
-            if (compraId == null) {
-                return ResponseEntity.badRequest()
-                        .body(java.util.Map.of("error", "Falta 'compra_idcompra' o 'compra.idcompra' en el JSON"));
+            JsonNode facturaNode = payload;
+            if (payload.has("factura") && payload.get("factura").isObject()) {
+                facturaNode = payload.get("factura");
             }
 
-            Optional<CompraModel> compOpt = compraService.getCompraById(compraId);
+            FacturaCompraDTO dto;
+            try {
+                dto = objectMapper.treeToValue(facturaNode, FacturaCompraDTO.class);
+            } catch (Exception ex) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("error","JSON de factura inválido","detail", ex.getMessage()));
+            }
+
+            if (dto.getCompraId() == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("error","Falta 'compra_idcompra' o 'compra.idcompra' en el JSON"));
+            }
+            if (dto.getMedioPago() == null || dto.getMedioPago().isBlank()) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("error","Falta 'medio_pago'"));
+            }
+            if (dto.getTotal() == null) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("error","Falta 'total'"));
+            }
+
+            Optional<CompraModel> compOpt = compraService.getCompraById(dto.getCompraId());
             if (compOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(java.util.Map.of("error", "Compra con id " + compraId + " no encontrada."));
+                        .body(java.util.Map.of("error","Compra con id " + dto.getCompraId() + " no encontrada."));
             }
 
             FacturaCompraModel entidad = dto.toEntity(compOpt.get());
@@ -102,10 +125,12 @@ public class FacturaCompraController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(FacturaCompraDTO.fromEntity(saved));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(java.util.Map.of("message", "Error interno al procesar la factura", "detail", e.getMessage()));
+                    .body(java.util.Map.of("message","Error interno al procesar la factura","detail",e.getMessage()));
         }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<?> putFacturaCompra(@PathVariable Integer id, @Valid @RequestBody FacturaCompraDTO dto) {

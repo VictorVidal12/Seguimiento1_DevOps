@@ -1,0 +1,13 @@
+project_id   = "example-"
+region       = "example"
+service_name = "example"
+zone = "example"
+image = "example"
+sql_root_password = "example"
+bucket_name  = "example"
+db_user      = "example"
+db_password  = "example"
+allow_unauth = false
+artifact_repo_location = "example"
+artifact_repo_name = "example"
+app_user_password = "example"
