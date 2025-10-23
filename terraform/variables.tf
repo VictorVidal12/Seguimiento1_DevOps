@@ -68,3 +68,28 @@ variable "bucket_name" {
   description = "Name of Bucket in Cloud Bucket"
   type        = string
 }
+
+variable "spring_user_name" {
+  description = "Name of alter user in the database"
+  type = string
+}
+
+variable "spring_jpa_hibernate" {
+  description = "Hibernate of the project"
+  type = string
+}
+
+variable "spring_url_socket" {
+  description = "URL of the Database in SocketFactory"
+  type = string
+}
+
+variable "db_name" {
+  description = "Name of the Database in Cloud SQL"
+  type = string
+}
+
+variable "instance_cloud_sql" {
+  description = "Name instace of Cloud SQL"
+  type = string
+}

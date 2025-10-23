@@ -7,16 +7,16 @@ data "google_storage_bucket" "logs_bucket" {
 }
 
 resource "google_logging_project_sink" "to_bucket" {
-  name                   = "export-logs-to-bucket"
-  project                = var.project_id
-  destination            = "storage.googleapis.com/${data.google_storage_bucket.logs_bucket.name}"
-  filter                 = ""
+  name = "export-logs-to-bucket"
+  project  = var.project_id
+  destination = "storage.googleapis.com/${data.google_storage_bucket.logs_bucket.name}"
+  filter = ""
   unique_writer_identity = true
 }
 
 resource "google_storage_bucket_iam_member" "sink_writer" {
   depends_on = [google_logging_project_sink.to_bucket]
   bucket = data.google_storage_bucket.logs_bucket.name
-  role   = "roles/storage.objectCreator"
+  role = "roles/storage.objectCreator"
   member = google_logging_project_sink.to_bucket.writer_identity
 }

@@ -1,69 +1,74 @@
 module "project_services" {
-  source     = "./modules/project_services"
+  source = "./modules/project_services"
   project_id = var.project_id
-  region     = var.region
+  region = var.region
 }
 
 module "artifact_repository" {
-  source     = "./modules/artifact_registry"
+  source = "./modules/artifact_registry"
   project_id = var.project_id
-  location   = var.artifact_repo_location
-  repo_name  = var.artifact_repo_name
+  location = var.artifact_repo_location
+  repo_name = var.artifact_repo_name
 }
 
 module "cloud_storage" {
-  source      = "./modules/cloud_storage"
-  project_id  = var.project_id
-  region      = var.region
+  source = "./modules/cloud_storage"
+  project_id = var.project_id
+  region = var.region
   bucket_name = "${var.project_id}-logs-bucket"
 }
 
 module "cloud_logging" {
-  source      = "./modules/cloud_logging"
-  project_id  = var.project_id
+  source = "./modules/cloud_logging"
+  project_id = var.project_id
   bucket_name = module.cloud_storage.logs_bucket_name
 }
 
 module "cloud_sql" {
-  source            = "./modules/cloud_sql"
-  project_id        = var.project_id
-  region            = var.region
-  root_password     = var.sql_root_password
-  database_name     = "Casa_empennio"
+  source = "./modules/cloud_sql"
+  project_id = var.project_id
+  region = var.region
+  root_password = var.sql_root_password
+  database_name = var.db_name
   app_user_password = var.app_user_password
 }
 
 module "cloud_run" {
-  source       = "./modules/cloud_run"
-  project_id   = var.project_id
-  region       = var.region
+  source = "./modules/cloud_run"
+  project_id = var.project_id
+  region = var.region
   service_name = var.service_name
-  image        = module.cloud_build.image_name
+  image = module.cloud_build.image_name
   allow_unauth = true
-  db_user      = var.db_user
+  db_user = var.db_user
   db_password  = var.db_password
   depends_on = [
     module.artifact_repository,
     module.cloud_storage
   ]
+  db_name = var.db_name
+  instance_cloud_sql = var.instance_cloud_sql
+  spring_jpa_hibernate = var.spring_jpa_hibernate
+  spring_url_socket = var.spring_url_socket
+  spring_user_name = var.spring_user_name
 }
 
 
 module "cloud_build" {
-  source        = "./modules/cloud_build"
-  project_id    = var.project_id
-  region        = var.region
+  source = "./modules/cloud_build"
+  project_id = var.project_id
+  region = var.region
   artifact_repo = var.artifact_repo_name
-  image_name    = "us-central1-docker.pkg.dev/${var.project_id}/java-artifacts/mi-app:latest"
-  source_bucket = "my-project-terraform-474601-logs-bucket"
+  image_name = var.image
+  source_bucket = var.bucket_name
   source_object = "source.tar.gz"
 }
 
 resource "null_resource" "create_and_upload_source" {
   triggers = {
     project_id = var.project_id
-    bucket     = module.cloud_storage.logs_bucket_name
-    object     = "source.tar.gz"
+    bucket = module.cloud_storage.logs_bucket_name
+    object = "source.tar.gz"
   }
 
   provisioner "local-exec" {

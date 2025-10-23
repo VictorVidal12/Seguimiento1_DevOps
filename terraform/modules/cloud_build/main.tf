@@ -19,7 +19,7 @@ variable "source_bucket" {
 }
 
 variable "source_object" {
-  type    = string
+  type = string
   default = "source.tar.gz"
 }
 
@@ -30,10 +30,10 @@ resource "null_resource" "build_image" {
   }
 
   triggers = {
-    project_id     = var.project_id
-    image_name     = var.image_name
-    source_bucket  = var.source_bucket
-    source_object  = var.source_object
+    project_id = var.project_id
+    image_name = var.image_name
+    source_bucket = var.source_bucket
+    source_object = var.source_object
   }
 }
 

@@ -9,8 +9,8 @@ variable "app_user_password" {type = string }
 
 resource "google_sql_database_instance" "default" {
   project = var.project_id
-  name    = "${var.project_id}-sql"
-  region  = var.region
+  name = "${var.project_id}-sql"
+  region = var.region
 
   database_version = "POSTGRES_17"
 
@@ -27,13 +27,13 @@ resource "google_sql_database_instance" "default" {
 }
 
 resource "google_sql_database" "app_db" {
-  name     = var.database_name
-  project  = var.project_id
+  name  = var.database_name
+  project = var.project_id
   instance = google_sql_database_instance.default.name
 }
 
 resource "google_sql_user" "app_user" {
-  name     = "empennio_user"
+  name = "empennio_user"
   instance = google_sql_database_instance.default.name
   project  = var.project_id
   password = var.app_user_password
